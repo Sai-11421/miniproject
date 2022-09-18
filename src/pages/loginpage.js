@@ -1,39 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './login.css'
 import Logo from '../assets/rgukt.png'
+import { firestore } from '../firebase/firebase-utils'
 
-const Loginpage = () => {
+const Loginpage = (props) => {
+    const [username, setusername] = useState('');
+    const [password, setpassword] = useState('');
+
+    const [students, setstudents] = useState([]);
+    const [error, seterror] = useState('');
+
+    useEffect(() => {
+        firestore.collection('Students').get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    setstudents([...students, doc.data()])
+                })
+            })
+    }, []);
+
+    const loginUser = (e) => {
+        e.preventDefault()
+        let student = students.filter((s) => s.username === username && s.password === password)
+        if (student.length !== 0) {
+            seterror('')
+            props.history.push('/')
+            alert('Logged in successfully')
+        } else {
+            seterror('Invalid username/password')
+        }
+    }
+
     return (
         <div>
-            <div className="nav">
-                <div style={{ left: '400px', height: '270px' }}>
-                    <img src={Logo} height="200px" />
-                    <h3 style={{ marginBottom: '50px' }}><b> <br /> <br />AN APPROACH TO TEST STUDENT KNOWLEDGE</b></h3>
+            <div className="login">
+                <div>
+                    <img alt="logo" src={Logo} height="250px" />
+                    <h3 style={{ marginBottom: '50px', color: '#000' }}><b> <br /> <br />AN APPROACH TO TEST STUDENT KNOWLEDGE</b></h3>
                 </div>
 
-                <div className="main" style={{
-                    right: '10px', bottom: '80px'
-                }}>
-                    <p id="sign" align="center" style={{ right: '45px' }}> Student Sign in</p>
+                <div className="main" style={{ right: '10px', bottom: '80px' }}>
+                    <p id="sign" align="center"> Student Sign in</p>
                     <form className="form1">
-                        <input className="un " type="text" align="center" placeholder="Username" /><br />
-                        <br /><input className="pass" type="password" align="center" placeholder="Password" />
-                        <br /><br /><a className="submit" align="center">
-                            <h3>Sign in </h3>
-                        </a>
-                        <br /><br />
-                        <p className="forgot" align="center"><a href="#" style={{ position: 'relative', top: '30px', left: '10px' }}>Forgot Password?
-                        </a></p>
-                        <br /> <br />
-                        <p className="a" align="center">
-                            <a href="register.html" style={{ fontWeight: '700', position: 'relative', top: '60px', left: '20px' }}>
-                                <h4> Don't have account? <u>SignUp</u></h4></a></p>
-
-
-                        <div className="wel" style={{ marginTop: '400px', marginLeft: '150px' }}>
-
-                            <h1 style={{ position: 'relative', bottom: '20px' }}> </h1>
+                        <input className="un " type="text" align="center" placeholder="Username" onChange={(e) => setusername(e.target.value)} /><br />
+                        <input className="pass" type="password" align="center" placeholder="Password" onChange={(e) => setpassword(e.target.value)} /><br />
+                        <p style={{ color: 'tomato', fontSize: '16px', textAlign: 'center', marginBottom: '20px' }}>{error}</p>
+                        <div className="button">
+                            <center>
+                                <input type="submit" value="Sign in " onClick={(e) => loginUser(e)} style={{ cursor: 'pointer', marginBottom: '20px' }} />
+                                <p style={{ fontSize: 'medium', color: '#000000' }}>Don't have an account? <span onClick={() => { props.history.push('/register') }} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Signup</span></p>
+                            </center>
                         </div>
+
 
                     </form>
                 </div>
