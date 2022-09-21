@@ -29,7 +29,7 @@ const CategoryPage = (props) => {
                     </div>
                 </Card>
             )}
-        </div>
+        </div><button class= "btn btn-success" onClick = {()=>alert("Your Response will submitted successfully")}> Submit </button></>
     );
 };
 
